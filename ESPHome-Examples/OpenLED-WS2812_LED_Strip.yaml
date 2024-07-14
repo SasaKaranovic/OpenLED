@@ -1,0 +1,58 @@
+# Change below substitutions if you want to edit
+# device host-name and sensor names
+substitutions:
+  hostname: light
+  devicename: OpenLED Addressable LED
+  ledcount: 60
+  wifiname: replace-with-your-wifi-name
+  wifipass: replace-with-wifi-password
+  otapass: replace-with-ota-password
+  encryptionkey: "v7YQth0Xao/0hPguvM1mkGfjZKthhCEVuoF9u/QZiQo=" # <-- Please change this (https://esphome.io/components/api.html)
+
+# -- You normally should not have to change any of the parameters below.
+# -- But it can be fun to play around with them if you understand what they mean! :)
+# -- The documentation can be fount at https://esphome.io/
+esphome:
+  name: openled-$hostname
+  platform: esp32
+  board: esp32-c3-devkitm-1
+  platformio_options:
+    board_build.f_cpu: 80000000L
+
+wifi:
+  use_address: openled-$hostname.local
+  ssid: "$wifiname" # <
+  password: "$wifipass"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "OpenLED ${hostname} WiFi"
+
+captive_portal:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "$encryptionkey"
+
+ota:
+  password: "$otapass"
+
+# Example configuration entry
+web_server:
+  port: 80
+  version: 2
+
+# Example configuration entry
+light:
+  # Neopixel LED strip
+  - platform: neopixelbus
+    id: LedsStrip
+    variant: WS2812
+    type: GRB
+    pin: GPIO6
+    method:
+      type: esp32_rmt
+      channel : 1
+    num_leds: $ledcount
+    name: "$devicename Addresable LEDs"
